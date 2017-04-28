@@ -1,0 +1,17 @@
+"Local Option"
+
+-Using FSA Table implementation - Can be found in fsa_table.h and fsa_table.cpp
+
+-NOTE: The FSA table is partially constructed using a for loop (many rows had same or similar cell values), so it is generated rather than hard-coded. The FSA table is printed to the console for viewing, before token outputs
+
+Notes:
+-Scanner is whitespace-sensitive
+
+-Comments - beginning with '#' - can occur anywhere in program, not just the start of the line. Checked with professor to see if they are terminated by any whitespace character, or if they span to the end of the current line, and he indicated the latter
+
+-For keyboard input, the scanner reads consecutive lines, not words or characters at a time
+
+Build:
+-Build with: make
+-run with: ./testScanner [inputFileNameNoExtension]
+-clean with: make clean
