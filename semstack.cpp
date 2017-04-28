@@ -41,7 +41,7 @@ void SVT::push(string tkn){
 	if( ! isFull()){
 		top++;
 		stackArr[top] = tkn;
-		cout << "pushing " << tkn << " at position " << top << endl;
+		// cout << "pushing " << tkn << " at position " << top << endl;
 	}
 }
 
@@ -52,7 +52,7 @@ void SVT::pop(){
 
 	if(! isEmpty()){
 		top--;
-		cout << "popping stack, top is now " << top << endl;
+		// cout << "popping stack, top is now " << top << endl;
 	}
 
 }
@@ -67,13 +67,13 @@ int SVT::find(string tkn){
 	for(int i = 0, j = top; i <= j; i++){
 		if(stackArr[j - i] == tkn){
 			position = i;
-			cout << "found " << tkn << " in stack at position " << i <<  endl;
+			// cout << "found " << tkn << " in stack at position " << i <<  endl;
 			break;
 		}
 	}
 
 	if(position == -1){
-		cout << tkn << " not in stack" << endl;
+		// cout << tkn << " not in stack" << endl;
 	}
 
 	return position;
