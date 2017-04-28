@@ -1,10 +1,14 @@
-"Local Option"
+P1-Using FSA Table implementation - Can be found in fsa_table.h and fsa_table.cpp
+	-NOTE: The FSA table is partially constructed using a for loop (many rows had same or similar cell values), so it is generated rather than hard-coded.
 
--Using FSA Table implementation - Can be found in fsa_table.h and fsa_table.cpp
+P3: Local Option
 
--NOTE: The FSA table is partially constructed using a for loop (many rows had same or similar cell values), so it is generated rather than hard-coded. The FSA table is printed to the console for viewing, before token outputs
+P4: Local Option
 
 Notes:
+
+-Seems to work properly with all test files given
+
 -Scanner is whitespace-sensitive
 
 -Comments - beginning with '#' - can occur anywhere in program, not just the start of the line. Checked with professor to see if they are terminated by any whitespace character, or if they span to the end of the current line, and he indicated the latter
@@ -13,5 +17,5 @@ Notes:
 
 Build:
 -Build with: make
--run with: ./testScanner [inputFileNameNoExtension]
+-run with: ./comp[inputFileNameNoExtension]
 -clean with: make clean
