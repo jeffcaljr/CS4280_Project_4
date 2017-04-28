@@ -9,6 +9,7 @@
 #include "node.h"
 #include <fstream>
 
+//perform semantic parsing of parse tree, and generate output file in asm language
 void semParser(node*, ofstream &);
 
 #endif

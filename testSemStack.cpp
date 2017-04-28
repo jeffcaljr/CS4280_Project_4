@@ -10,31 +10,30 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <cstdlib>
 
 using namespace std;
 
 //GLOBAL VARIABLES
 
-static vector<string> globalVars;
-
-static int tempVars = -1; //Temporary vars will all be labeled T#
-static int labelSuffix = 0; //Used to generate unique labels
+static int tempVars = -1; //Temporary vars will all be labeled T# (T0, T1, ... Tn)
+static int labelSuffix = 0; //Used to generate unique labels ('LABEL0', 'LABEL1', ... 'LABELn')
 
 static int varCount = 0;	//used to keep track of the number of variables declared in a block; reset when block is exited
-SVT svt(100);	//stack for monitoring scopes
+
+SVT svt(100);	//stack for monitoring scopes; can't be more than size 100
 
 //Function Prototypes
-void pushIdentifiers(node*, ofstream& output);
-int getStackPosition(node*, ofstream& output);
-string createTempVar();
-string createLabel();
+void pushIdentifiers(node*, ofstream& output); // pushes a node's identifiers onto the stack (usually just 1 identifier)
+int getStackPosition(node*); //finds the position of a label in the stack; throws error if not found
+string createTempVar(); //generates a temporary variable name upon being called (ex: 'T1')
+string createLabel(); //generates a label name upon being called (ex: 'LABEL1')
 
 //FUNCTION DEFINITIONS
 
 //***************************
 //	Auxillary function to perform semantic parsing on a statically-parsed tree
 //	attempt to push identifiers for a given node onto the stack, or check if they are already defined before being used
-
 //***************************
 void semParser(node* ptr, ofstream& output){	
 	if(ptr == NULL){
@@ -46,17 +45,14 @@ void semParser(node* ptr, ofstream& output){
 		semParser(ptr->child1, output);
 		semParser(ptr->child2, output);
 
+		//signal end of program; before variable declarations
+
 		output << "STOP" << endl;
 
-		//set all vars to 0
-
+		//initialize all temporary variables
 		for(int i = tempVars; i >= 0; i--){
 			svt.pop();
 			output << "T" << i << " 0" << endl;
-		}
-
-		for(vector<string>::iterator i = globalVars.begin(); i != globalVars.end(); ++i){
-			output << (*i) << " 0" << endl;
 		}
 
 	}
@@ -84,7 +80,6 @@ void semParser(node* ptr, ofstream& output){
 	else if(ptr->label == "vars"){
 		pushIdentifiers(ptr, output);
 
-		//what to parse next?
 		semParser(ptr->child1, output);
 
 	}
@@ -166,13 +161,17 @@ void semParser(node* ptr, ofstream& output){
 				output << "LOAD " << ((ptr->tkns).at(0)).instanceWord << endl;
 			}
 			else{
-				int position = getStackPosition(ptr, output);
+				int position = getStackPosition(ptr);
 				output << "STACKR " << position << endl;
 			}
 		}
 
 
 	}
+
+	//The following are possible nodes, but are handled in the "else" case
+	//Left in code for possible future changes
+
 	// else if(ptr->label == "stats"){
 
 	// 	semParser(ptr->child1, output);
@@ -192,7 +191,7 @@ void semParser(node* ptr, ofstream& output){
 	// }
 	else if(ptr->label == "in"){
 
-		int position = getStackPosition(ptr, output);
+		int position = getStackPosition(ptr);
 
 		string temp = createTempVar();
 
@@ -222,8 +221,6 @@ void semParser(node* ptr, ofstream& output){
 		output << "SUB " << temp << endl;
 
 		string label = createLabel();
-
-		// semParser(ptr->child2, output); //SHOULD CHILD 2 BE CALLED HERE?
 
 		if((ptr->child2)->tkns.at(0).id == LEFT_BITSHIFT_tk) {
 			if((ptr->child2)->tkns.size() > 1 && (ptr->child2)->tkns.at(1).id == EQUALS_tk){
@@ -326,19 +323,16 @@ void semParser(node* ptr, ofstream& output){
 
 		semParser(ptr->child1, output);
 
-		int position = getStackPosition(ptr, output);
+		int position = getStackPosition(ptr);
 
 		output << "STACKW " << position << endl;
 
 	}
+	//Relational operators handled inside 'If' and 'loop'
 	// else if(ptr->label == "ro"){
 
 	// }
 	else{
-		//variable usage
-		// int position = svt.find()
-
-		//what to parse next?
 		semParser(ptr->child1, output);
 		semParser(ptr->child2, output);
 		semParser(ptr->child3, output);
@@ -372,10 +366,10 @@ void pushIdentifiers(node* ptr, ofstream& output){
 
 
 //***************************
-//	Check if a node's variables were already defined; throwing an error if they were not
+//	Check if a node's variables were already defined; exiting with an error if they were not
 //***************************
-int getStackPosition(node* ptr, ofstream& output){
-	int position = -1;
+int getStackPosition(node* ptr){
+	int position = -1; //should never be returned
 
 	for(vector<token>::iterator i = (ptr->tkns).begin(); i != (ptr->tkns).end(); ++i){
 		//if the token is a number, no need to be defined
@@ -393,9 +387,12 @@ int getStackPosition(node* ptr, ofstream& output){
 		return position;
 	}
 
-	return position;
+	return position; //control should never reach this point
 }
 
+//***************************
+//	Generate a temporary variable name of the form 'T#'
+//***************************
 string createTempVar(){
 	ostringstream oss;
 	tempVars++;
@@ -403,6 +400,9 @@ string createTempVar(){
 	return oss.str();
 }
 
+//***************************
+//	Generate a label name of the form 'LABEL#'
+//***************************
 string createLabel(){
 	ostringstream oss;
 	oss << "LABEL" << labelSuffix;

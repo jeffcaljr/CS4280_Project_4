@@ -85,25 +85,32 @@ int main(int argc, char** argv){
 		perror("Cannot read from input file");
 		exit(1);
 	}
-
+	
+	if (inputfile.peek() == std::ifstream::traits_type::eof()){	
+		//Empty file
+		cout << "ERROR: input file is empty!" << endl;
+		exit(1);
+	}
+	
 	//create the generated output file 
 	ofstream assemblyOutputFile;
-	assemblyOutputFile.open(inputFilenameNoExtension + OUTPUT_FILE_EXTENSION, fstream::out);
+	assemblyOutputFile.open(string(inputFilenameNoExtension + OUTPUT_FILE_EXTENSION).c_str(), fstream::out);
 
 	
+	//generate parse tree
 
 	node* tree = parser(inputfile);
 
+
 	// traversePreorder(tree);
 
-	//perform semantic parsing of the statically-parsed tree
-	semParser(tree, assemblyOutputFile);
-
-	cout << "Parse successful." << endl;
-	
+	//perform semantic parsing of the statically-parsed tree, and generate .asm output file
+	semParser(tree, assemblyOutputFile);	
 
 	inputfile.close();
 	assemblyOutputFile.close();
+
+	cout << "Parse successful." << endl;
 
 	return 0;
 }
