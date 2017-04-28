@@ -43,7 +43,7 @@ int main(int argc, char** argv){
 		//keyboard input
 
 		ofstream tempfile;
-		tempfile.open(TEMPORARY_FILE_NAME.c_str(), fstream::app);
+		tempfile.open(TEMPORARY_FILE_NAME.c_str(), fstream::out);
 
 		if( ! tempfile.good()){
 			perror("Error creating temporary file for keyboard input");
@@ -62,6 +62,7 @@ int main(int argc, char** argv){
 		tempfile.close();
 
 		inputFilename = TEMPORARY_FILE_NAME;
+		inputFilenameNoExtension = "out";
 	}
 	else if(argc == 2){
 		//file input
